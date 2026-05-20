@@ -393,8 +393,8 @@ with st.expander("📂  STEP 2 — Upload Test Data & Configure", expanded=st.se
             if csv_file:
                 df_loaded = pd.read_csv(csv_file)
                 st.success(f"✅ `{csv_file.name}` — {len(df_loaded):,} rows, {df_loaded.shape[1]} columns")
-                with st.expander("👁 Preview", expanded=False):
-                    st.dataframe(df_loaded.head(8), use_container_width=True)
+                st.markdown("#### 👁 Preview")
+                st.dataframe(df_loaded.head(8), use_container_width=True)
         with col_b:
             st.markdown("#### Save test data from Jupyter")
             st.code("""test_df = X_test.copy()
