@@ -85,6 +85,26 @@ defaults = {
 for k,v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
+def fix_sklearn_model_compatibility(model):
+    """
+    Fix sklearn pickle compatibility issues between different sklearn versions.
+    Some older DecisionTree/RandomForest models do not contain monotonic_cst.
+    """
+    if not hasattr(model, "monotonic_cst"):
+        try:
+            model.monotonic_cst = None
+        except:
+            pass
+
+    if hasattr(model, "estimators_"):
+        try:
+            for est in model.estimators_:
+                if not hasattr(est, "monotonic_cst"):
+                    est.monotonic_cst = None
+        except:
+            pass
+
+    return model
 
 # ── HEADER ────────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -204,6 +224,7 @@ with st.expander("📦  STEP 1 — Connect Your Model", expanded=not st.session_
             if pkl_file:
                 try:
                     model_obj = pickle.load(pkl_file)
+                    model_obj = fix_sklearn_model_compatibility(model_obj)
                     if not hasattr(model_obj, 'predict'):
                         st.error("❌ Not a valid model — must have .predict() method")
                     else:
